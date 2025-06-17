@@ -4,6 +4,7 @@ let jwt=require("jsonwebtoken");
 let cookie=require("cookie-parser");
 let db=require("../config/db.js");
 
+//
 exports.homeCtrl=(req,res)=>{
     res.render("home.ejs");
 }
@@ -96,53 +97,95 @@ exports.hotelformCtrl=(req,res)=>{
   res.render("hotel.ejs");
 }
 
-exports.SaveHotel=(req,res)=>
-{
- let {hotel_name,hotel_address,city_id,area_id,hotel_email, hotel_contact,rating,pic_id}=req.body;
+// hotel add 
+exports.saveHotel = (req, res) => {
+  let {
+    hotel_id,
+    hotel_name,
+    hotel_address,
+    city_id,
+    area_id,
+    hotel_email,
+    hotel_contact,
+    rating,
+    reviewcount
+  } = req.body;
 
-console.log(pic_id+ "  pic id is ")
-db.query("insert into hotelmaster  values('0',?,?,?,?,?,?,?,?)", [hotel_name,hotel_address,city_id,area_id,hotel_email, hotel_contact,rating,pic_id],(err,result)=>
-{
-	db.query("SELECT * FROM citymaster",(err,citresult)=>{
+  console.log(req.body);
 
-	db.query("SELECT * FROM areamaster",(err,arearesult)=>{
+  // Convert data types
+  hotel_id = parseInt(hotel_id);
+  city_id = parseInt(city_id);
+  area_id = parseInt(area_id);
+  hotel_contact = parseInt(hotel_contact);
+  rating = parseFloat(rating);
+  reviewcount = parseInt(reviewcount);
 
-	db.query("SELECT * FROM hotelpicjoin",(err,picresult)=>{
-     res.render("hotel.ejs",{Citdata:citresult,Areadata:arearesult,Picdata:picresult,msg:"Hotel added successfully "});
-})
-})
-})
-});
-};
+  let query = `INSERT INTO hotelmaster (hotel_name, hotel_address, city_id, area_id, hotel_email, hotel_contact, rating, reviewcount)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
 
+  let values = [hotel_name, hotel_address, city_id, area_id, hotel_email, hotel_contact, rating, reviewcount];
 
-exports.hotelviewCtrl=(req,res)=>{
-   let query = `SELECT h.hotel_id, p.filename, h.hotel_name, h.hotel_address, c.city_name, a.area_name, h.hotel_email, h.hotel_contact, h.rating FROM hotelmaster h LEFT JOIN hotelpicjoin p ON h.pic_id = p.pic_id JOIN citymaster c ON h.city_id = c.city_id JOIN areamaster a ON h.area_id = a.area_id`;
-db.query(query, (err, result) => {
+  db.query(query, values, (err, result) => {
     if (err) {
-      
-      return res.render("hotelview.ejs",{ data: [] }); 
-    } 
-    else {
-      res.render("hotelview.ejs",{ data: result });
+      console.error("Error inserting hotel:", err);
+      return res.send("Error saving hotel data");
+    } else {
+       console.log("successfully added");
+       
     }
-});
+  });
 };
+
+
+exports.hotelviewCtrl = (req, res) => {
+ 
+  db.query("SELECT * FROM citymaster", (err, citResult) => {
+    if (err) {
+      return res.send("Error loading cities");
+    }
+
+    db.query("SELECT * FROM areamaster", (err, areaResult) => {
+      if (err) {
+        return res.send("Error loading areas");
+      }
+
+      res.render("hotel.ejs", {
+        data: citResult,
+        Areadata: areaResult,
+      });
+    });
+  });
+};
+
+
+
+
+
+
+
 
 //Hotel Image Controller
 
 exports.hotelImageDashCtrl=(req,res)=>{
    res.render("HotelImageDash.ejs"); 
-}
+};
 
 exports.HotelImageformCtrl=(req,res)=>{
-  res.render("addHotelImage.ejs");
-}
+  res.render("addHotelImage.ejs",{ msg: "Hotel image uploaded successfully!" });
+};
 
-
-
-
-
+exports.hotelImageaddCtrl = (req, res) => {
+   let {filename}=req.body;
+  db.query("INSERT INTO hotelpicjoin VALUES ('0', ?)", [filename], (err, result) => {
+    if (err) {
+      console.log(err);
+      res.render("addHotelImage.ejs", { msg: "Some Problem Occurred while Adding Pic" });
+    } else {
+      res.render("addHotelImage.ejs", { msg: "Pic added successfully" });
+    }
+  });
+};
 
 
 // City All Controller
@@ -281,6 +324,18 @@ exports.areaDeleteCtrl=(req, res) => {
   });
 };
 
+// Customer 
+  exports.ViewHotelDash=(req,res)=>{
+
+  db.query("SELECT * FROM citymaster",(err,citresult)=>{
+
+	db.query("SELECT * FROM areamaster",(err,arearesult)=>{
+
+	res.render("customer.ejs",{Citdata:citresult,Areadata:arearesult});
+
+	});
+});
+};
 
 // User Dashboard Router
 exports.userPanel=(req,res)=>{

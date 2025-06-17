@@ -34,7 +34,7 @@
       }
 
       .btn-orange {
-        background-color: #ff8800;
+        background-color: purple;
         color: #fff;
         font-weight: 600;
         width: 150px;
@@ -45,7 +45,7 @@
       }
 
       .btn-orange:hover {
-        background-color: #e67300;
+        background-color:purple;
       }
 
       .btn-row {
@@ -75,16 +75,18 @@
     <div class="box">
       <h4 class="text-center text-uppercase mb-4" style="color:purple;">Upload Hotel Image</h4>
 
-      <form type="submit" action="/hotelImgDash" method="post" >
+      <form type="submit" action="/hotelImageadd" method="post"  >
 
         <div class="form-group">
           <input type="file" class="form-control" id="name" name="filename" required />
         </div>
 
         <!-- Message Box -->
+         <% if (typeof msg !== 'undefined' && msg) { %>
         <div class="alert alert-warning alert-dismissible fade show" style="width:350px; margin-left:20px" role="alert">
             <strong><%=msg%></strong>   
           </div>
+         <% } %>
 
         <!-- Buttons Side-by-Side -->
         <div class="btn-row">

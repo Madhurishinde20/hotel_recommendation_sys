@@ -15,3 +15,5 @@ exports.regserviceLogic = async (username, useremail, password, contact, type) =
 exports.getOriginalPassword = (username) => {
   return regModel.getPasswordFromDB(username);
 };
+
+

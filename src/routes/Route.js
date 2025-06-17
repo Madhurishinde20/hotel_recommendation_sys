@@ -15,6 +15,7 @@ router.get("/login",controller.regLogin);
 router.get("/signin", controller.regLogin);
 router.get("/signup", controller.regCtrl);
 
+
 router.post("/validate",controller.validateUser);
 
 //Admin Dashboard Controller
@@ -23,15 +24,16 @@ router.get("/admin", controller.adminDashboard);
 
 router.get("/hotelDash",controller.hotelDashCtrl);
 
-router.get("/hotelform",controller.hotelformCtrl);
+router.post("/addhotel", controller.saveHotel);
 
-router.get("/hotelviewdata",controller.hotelviewCtrl);
+router.get("/hotelform",controller.hotelviewCtrl);
 
 
 router.get("/hotelImgDash",controller.hotelImageDashCtrl);
 
 router.get("/hotelImgform",controller.HotelImageformCtrl);
 
+router.post("/hotelImageadd",controller.hotelImageaddCtrl);
 
 
 
@@ -56,6 +58,12 @@ router.post("/areaadd",controller.areaadd);
 router.get("/viewarea",controller.viewAreaCtrl);
 
 router.get("/deletearea",controller.areaDeleteCtrl);
+
+
+
+router.get("/viewcustomer",controller.ViewHotelDash);
+
+
 
 
 

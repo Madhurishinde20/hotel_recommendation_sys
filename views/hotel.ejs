@@ -98,12 +98,7 @@ button:hover {
 
 <div class="form-container">
   <h2>Hotel Master Form</h2>
-<form id="hotelForm" method="POST" action="/savehotel" enctype="multipart/form-data" novalidate>
-    <div class="form-group">
-  <label for="hotel_id">Hotel ID</label>
-  <input type="number" id="hotel_id" name="hotel_id" min="1">
-  <div class="error" id="error_hotel_id"></div>
-   </div>
+<form method="POST" action="/addhotel" name="frm">
    
     <div class="form-group">
       <label for="hotel_name">Hotel Name</label>
@@ -118,7 +113,7 @@ button:hover {
 
         <div class="form-group ">
           <label>City</label>
-          <select name="city_id" class="form-control" onchange="fetcharea(this.value)" id="ns">
+          <select name="city_id" id="city_id" class="form-control" onchange="fetcharea(this.value)" >
             <option selected disabled>Select City</option>
             <% data.forEach((item, index) => { %>
               <option value="<%= item.city_id %>"><%= item.city_name %></option>
@@ -128,7 +123,7 @@ button:hover {
 
         <div class="form-group ">
           <label>Area</label>
-          <select name="area_id" class="form-control" id="area">
+          <select name="area_id" class="form-control" id="area_id">
             <option selected disabled>Select Area</option>
             <% Areadata.forEach((item, index) => { %>
               <option value="<%= item.area_id %>"><%= item.area_name %></option>
@@ -159,19 +154,10 @@ button:hover {
       <input type="number" id="reviewcount" name="reviewcount" min="0">
       <div class="error" id="error_reviewcount"></div>
     </div>
-
-    <div class="form-group ">
-          <label>Hotel Image</label>
-          <select name="pic_id" class="form-control">
-            <option selected disabled>Select Image</option>
-            <% Picdata.forEach((item, index) => { %>
-              <option value="<%= item.pic_id %>"><%= item.filename %></option>
-            <% }); %>
-          </select>
-        </div>
-
-    <button type="submit">Submit Hotel</button>
+    <input type="submit" value="Add Hotel">
   </form>
+
+  
 </div>
 
 <script>
@@ -239,7 +225,7 @@ button:hover {
 
     if (isValid) {
       alert("Form submitted successfully!");
-      // this.submit(); // Uncomment when integrating with backend
+       this.submit(); 
     }
   });
 </script>
