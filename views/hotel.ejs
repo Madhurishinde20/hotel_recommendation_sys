@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Hotel Master Form</title>
+  <style>
+.form-container {
+  background: linear-gradient(145deg, #e0eafc, #cfdef3); /* soft HD background */
+  padding: 35px 30px;
+  margin: 40px auto;
+  border-radius: 18px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  width: 100%;
+  max-width: 600px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+} 
+h2 {
+  text-align: center;
+  color: #2c3e50;
+  margin: 10px 0 30px;
+  font-size: 30px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  border-bottom: 2px solid #c7d2e5;
+  padding-bottom: 10px;
+}
+
+.form-group {
+  margin-bottom: 18px;
+}
+
+label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #34495e;
+  font-size: 15px;
+}
+
+input,
+select {
+  width: 100%;
+  padding: 12px 14px;
+  font-size: 15px;
+  border: 1.8px solid #ccc;
+  border-radius: 8px;
+  background-color: #fdfdfd;
+  transition: border 0.3s, box-shadow 0.3s;
+}
+
+input:focus,
+select:focus {
+  border-color: #3498db;
+  box-shadow: 0 0 4px #a3d0f7;
+  background-color: #ffffff;
+  outline: none;
+}
+
+.error {
+  color: #e74c3c;
+  font-size: 13px;
+  margin-top: 4px;
+  font-style: italic;
+}
+
+button {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(to right, #00c9ff, #92fe9d);
+  border: none;
+  border-radius: 10px;
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s ease-in-out, transform 0.2s;
+}
+
+button:hover {
+  background: linear-gradient(to right, #92fe9d, #00c9ff);
+  transform: scale(1.02);
+}
+
+@media (max-width: 600px) {
+  .form-container {
+    padding: 25px 20px;
+    margin: 20px;
+  }
+
+  h2 {
+    font-size: 24px;
+  }
+}
+
+  </style>
+</head>
+<body>
+
+<div class="form-container">
+  <h2>Hotel Master Form</h2>
+<form id="hotelForm" method="POST" action="/savehotel" enctype="multipart/form-data" novalidate>
+    <div class="form-group">
+  <label for="hotel_id">Hotel ID</label>
+  <input type="number" id="hotel_id" name="hotel_id" min="1">
+  <div class="error" id="error_hotel_id"></div>
+   </div>
+   
+    <div class="form-group">
+      <label for="hotel_name">Hotel Name</label>
+      <input type="text" id="hotel_name" name="hotel_name" maxlength="200">
+      <div class="error" id="error_hotel_name"></div>
+    </div>
+
+    <div class="form-group ">
+          <label>Hotel Address</label>
+          <input type="text" class="form-control" name="hotel_address" placeholder="Enter Hotel Address" />
+        </div>
+
+        <div class="form-group ">
+          <label>City</label>
+          <select name="city_id" class="form-control" onchange="fetcharea(this.value)" id="ns">
+            <option selected disabled>Select City</option>
+            <% data.forEach((item, index) => { %>
+              <option value="<%= item.city_id %>"><%= item.city_name %></option>
+            <% }); %>
+          </select>
+        </div>
+
+        <div class="form-group ">
+          <label>Area</label>
+          <select name="area_id" class="form-control" id="area">
+            <option selected disabled>Select Area</option>
+            <% Areadata.forEach((item, index) => { %>
+              <option value="<%= item.area_id %>"><%= item.area_name %></option>
+            <% }); %>
+          </select>
+        </div>
+
+
+    <div class="form-group">
+      <label for="hotel_email">Hotel Email</label>
+      <input type="email" id="hotel_email" name="hotel_email">
+      <div class="error" id="error_hotel_email"></div>
+    </div>
+
+    <div class="form-group">
+      <label for="hotel_contact">Hotel Contact</label>
+      <input type="tel" id="hotel_contact" name="hotel_contact" maxlength="10">
+      <div class="error" id="error_hotel_contact"></div>
+    </div>
+
+     <div class="form-group ">
+          <label>Rating</label>
+          <input type="text" class="form-control" name="rating" placeholder="Enter Rating" />
+        </div>
+
+    <div class="form-group">
+      <label for="reviewcount">Review Count</label>
+      <input type="number" id="reviewcount" name="reviewcount" min="0">
+      <div class="error" id="error_reviewcount"></div>
+    </div>
+
+    <div class="form-group ">
+          <label>Hotel Image</label>
+          <select name="pic_id" class="form-control">
+            <option selected disabled>Select Image</option>
+            <% Picdata.forEach((item, index) => { %>
+              <option value="<%= item.pic_id %>"><%= item.filename %></option>
+            <% }); %>
+          </select>
+        </div>
+
+    <button type="submit">Submit Hotel</button>
+  </form>
+</div>
+
+<script>
+  document.getElementById("hotelForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+
+    let isValid = true;
+
+    // Helper function to show error
+    function showError(id, message) {
+      document.getElementById("error_" + id).innerText = message;
+      isValid = false;
+    }
+
+    // Clear all errors before validation
+    document.querySelectorAll(".error").forEach(el => el.innerText = "");
+
+    // Field values
+    let hotel_id = document.getElementById("hotel_id").value.trim();
+    let hotel_name = document.getElementById("hotel_name").value.trim();
+    let hotel_address = document.getElementById("hotel_address").value.trim();
+    let city_id = document.getElementById("city_id").value;
+    let area_id = document.getElementById("area_id").value;
+    let hotel_email = document.getElementById("hotel_email").value.trim();
+    let hotel_contact = document.getElementById("hotel_contact").value.trim();
+    let rating = document.getElementById("rating").value.trim();
+    let reviewcount = document.getElementById("reviewcount").value.trim();
+
+    // Validations
+    if (hotel_id === "" || isNaN(hotel_id) || hotel_id <= 0) {
+      showError("hotel_id", "Please enter a valid Hotel ID (positive number).");
+    }
+
+    if (hotel_name === "") {
+      showError("hotel_name", "Hotel name is required.");
+    }
+
+    if (hotel_address === "") {
+      showError("hotel_address", "Hotel address is required.");
+    }
+
+    if (city_id === "") {
+      showError("city_id", "Please select a city.");
+    }
+
+    if (area_id === "") {
+      showError("area_id", "Please select an area.");
+    }
+
+    if (hotel_email === "" || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(hotel_email)) {
+      showError("hotel_email", "Please enter a valid email address.");
+    }
+
+    if (!/^\d{10}$/.test(hotel_contact)) {
+      showError("hotel_contact", "Contact number must be 10 digits.");
+    }
+
+    if (rating === "" || isNaN(rating) || rating < 0 || rating > 5) {
+      showError("rating", "Rating must be between 0.0 and 5.0.");
+    }
+
+    if (reviewcount === "" || isNaN(reviewcount) || reviewcount < 0 || !Number.isInteger(Number(reviewcount))) {
+      showError("reviewcount", "Review count must be a non-negative integer.");
+    }
+
+    if (isValid) {
+      alert("Form submitted successfully!");
+      // this.submit(); // Uncomment when integrating with backend
+    }
+  });
+</script>
+
+</body>
+</html>
