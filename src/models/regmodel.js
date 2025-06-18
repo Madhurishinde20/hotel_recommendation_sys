@@ -31,3 +31,21 @@ exports.getPasswordFromDB=(username)=>{
             });
   });
 }
+exports.getdata=()=>
+{
+    return new Promise((resolve,reject)=>
+    {
+        conn.query("select * from hotelmaster",(err,result)=>
+        {
+            if(err)
+            {
+              console.log(err);
+              reject(err);
+            }
+            else
+            {
+              resolve(result);
+            }
+        });
+    });
+}

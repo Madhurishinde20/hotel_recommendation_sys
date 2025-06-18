@@ -3,7 +3,7 @@ const bcrypt = require("bcryptjs");
 let jwt=require("jsonwebtoken");
 let cookie=require("cookie-parser");
 let db=require("../config/db.js");
-
+let model=require("../models/regmodel.js");
 //
 exports.homeCtrl=(req,res)=>{
     res.render("home.ejs");
@@ -159,6 +159,24 @@ exports.hotelviewCtrl = (req, res) => {
 };
 
 
+exports.viewHotelCtrl = (req, res) => {
+  const hotelQuery = `
+     SELECT h.*, c.city_name, a.area_name,hp.filename
+       FROM hotelpicjoin hp inner join hotelmaster h on h.hotel_id=hp.hotel_id
+       JOIN citymaster c ON h.city_id = c.city_id
+       JOIN areamaster a ON h.area_id = a.area_id 
+  `;
+
+  db.query(hotelQuery, (err, hotelResults) => {
+    if (err) {
+      return res.send("Error loading hotels");
+    }
+
+    res.render("hotelview.ejs", {
+      data: hotelResults
+    });
+  });
+};
 
 
 
@@ -171,20 +189,38 @@ exports.hotelImageDashCtrl=(req,res)=>{
    res.render("HotelImageDash.ejs"); 
 };
 
-exports.HotelImageformCtrl=(req,res)=>{
-  res.render("addHotelImage.ejs",{ msg: "Hotel image uploaded successfully!" });
+exports.HotelImageformCtrl=async(req,res)=>{
+  try
+  {
+    let hd=await model.getdata();
+  res.render("addHotelImage.ejs",{ msg: "Hotel image uploaded successfully!" ,hoteldata:hd});
+  }
+  catch(err)
+  {
+    console.log(err);
+     res.render("addHotelImage.ejs",{ msg: "Hotel image uploaded successfully!",hoteldata:[] });
+  }
 };
 
-exports.hotelImageaddCtrl = (req, res) => {
-   let {filename}=req.body;
-  db.query("INSERT INTO hotelpicjoin VALUES ('0', ?)", [filename], (err, result) => {
+exports.hotelImageaddCtrl = async(req, res) => {
+   let {hotelname,filename}=req.body;
+   console.log(req.body);
+   try
+   {
+    let hd=await model.getdata();
+  db.query("INSERT INTO hotelpicjoin VALUES (?, ?)", [hotelname,filename], (err, result) => {
     if (err) {
       console.log(err);
-      res.render("addHotelImage.ejs", { msg: "Some Problem Occurred while Adding Pic" });
+      res.render("addHotelImage.ejs", { msg: "Some Problem Occurred while Adding Pic" ,hoteldata:hd});
     } else {
-      res.render("addHotelImage.ejs", { msg: "Pic added successfully" });
+      res.render("addHotelImage.ejs", { msg: "Pic added successfully" ,hoteldata:hd});
     }
   });
+}
+catch(err)
+{
+  res.render("addHotelImage.ejs",{ msg: "Hotel image uploaded successfully!",hoteldata:[] });
+}
 };
 
 
@@ -337,8 +373,21 @@ exports.areaDeleteCtrl=(req, res) => {
 });
 };
 
+
+
+
 // User Dashboard Router
 exports.userPanel=(req,res)=>{
   res.render("userDashboard");
 }
   
+exports.userhotelDashCtrl=(req,res)=>{
+  const Citdata = [
+    { city_id: 1, city_name: "Mumbai" },
+    { city_id: 2, city_name: "Pune" },
+    { city_id: 3, city_name: "Nashik" }
+  ];
+  const filename = "no"; 
+  res.render("userhotelDash.ejs",{ Citdata, filename });
+};
+
