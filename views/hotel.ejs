@@ -97,8 +97,8 @@ button:hover {
 <body>
 
 <div class="form-container">
-  <h2>Hotel Master Form</h2>
-<form method="POST" action="/addhotel" name="frm">
+  <h2>Hotel Details Form</h2>
+<form method="POST" action="/addhotel" name="frm" id="hotelForm">
    
     <div class="form-group">
       <label for="hotel_name">Hotel Name</label>
@@ -157,7 +157,8 @@ button:hover {
     <input type="submit" value="Add Hotel">
   </form>
 
-  
+
+ 
 </div>
 
 <script>
@@ -176,7 +177,7 @@ button:hover {
     document.querySelectorAll(".error").forEach(el => el.innerText = "");
 
     // Field values
-    let hotel_id = document.getElementById("hotel_id").value.trim();
+   
     let hotel_name = document.getElementById("hotel_name").value.trim();
     let hotel_address = document.getElementById("hotel_address").value.trim();
     let city_id = document.getElementById("city_id").value;
@@ -187,9 +188,7 @@ button:hover {
     let reviewcount = document.getElementById("reviewcount").value.trim();
 
     // Validations
-    if (hotel_id === "" || isNaN(hotel_id) || hotel_id <= 0) {
-      showError("hotel_id", "Please enter a valid Hotel ID (positive number).");
-    }
+    
 
     if (hotel_name === "") {
       showError("hotel_name", "Hotel name is required.");

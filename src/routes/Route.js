@@ -30,6 +30,22 @@ router.get("/hotelform",controller.hotelviewCtrl);
 
 router.get("/hotelviewdata", controller.viewHotelCtrl);
 
+router.get("/hotelviewdata/:id", controller.viewHotelwithImage);
+
+//hotel update data
+
+router.get("/updateHotel",controller.HotelUpadate);
+router.post("/finalupdateHotel",controller.FinlHotelUpadate);
+
+// router.get("/viewHotelAdmin", controller.ViewHotelAdmin);
+
+router.get("/updatehotel",controller.HotelView);
+
+// hotel delete data
+router.get("/deleteHotelAdminById",controller.HotelAdminDelete);
+
+
+
 
 
 
@@ -39,6 +55,7 @@ router.get("/hotelImgform",controller.HotelImageformCtrl);
 
 router.post("/hotelImageadd",controller.hotelImageaddCtrl);
 
+router.get("/image",controller.ViewImgCtrl);
 
 
 
@@ -65,7 +82,7 @@ router.get("/deletearea",controller.areaDeleteCtrl);
 
 
 
-router.get("/viewcustomer",controller.ViewHotelDash);
+router.get("/viewcustomer",controller.CustomerView);
 
 
 
@@ -78,7 +95,9 @@ router.get("/userDashboard",controller.userPanel);
 router.get("/userhotel",controller.userhotelDashCtrl);
 
 
-
+router.get("/addreview",controller.reviewRatingCtrl);
+router.get("/review",controller.Reviewpage);
+router.post("/savereview",controller.SaveReview)
 
 
 
