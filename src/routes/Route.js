@@ -33,6 +33,13 @@ router.get("/hotelviewdata", controller.viewHotelCtrl);
 
 
 
+
+
+
+
+
+
+
 router.get("/hotelImgDash",controller.hotelImageDashCtrl);
 
 router.get("/hotelImgform",controller.HotelImageformCtrl);

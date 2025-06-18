@@ -172,11 +172,13 @@ exports.viewHotelCtrl = (req, res) => {
       return res.send("Error loading hotels");
     }
 
-    res.render("hotelview.ejs", {
+    res.render("viewHotelAdmin.ejs", {
       data: hotelResults
     });
   });
 };
+
+
 
 
 

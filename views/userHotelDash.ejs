@@ -398,8 +398,8 @@
     const trigger = document.getElementById(triggerId);
     const dropdown = document.getElementById(dropdownId);
     const rect = trigger.getBoundingClientRect();
-    dropdown.style.top = ${rect.bottom + window.scrollY}px;
-    dropdown.style.left = ${rect.left + window.scrollX}px;
+    dropdown.style.top ='${rect.bottom + window.scrollY}px';
+    dropdown.style.left = '${rect.left + window.scrollX}px';
     dropdown.classList.toggle("show");
   }
 
@@ -420,7 +420,7 @@
 
   function redirectToCity(cityId) {
     if (cityId) {
-      window.location.href = /getFilterCity?id=${cityId};
+      window.location.href = '/getFilterCity?id=${cityId}';
     }
   }
 
