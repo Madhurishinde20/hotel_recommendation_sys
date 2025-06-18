@@ -78,6 +78,27 @@
       <form type="submit" action="/hotelImageadd" method="post"  >
 
         <div class="form-group">
+
+          <select name="hotelname">
+                <%if(hoteldata.length!=0)
+                {
+                  %>
+                  <option>Select Hotel Name</option>
+                  <%
+                  hoteldata.forEach((item)=>
+                  {
+                      %>
+                      <option value="<%=item.hotel_id%>"><%=item.hotel_name%></option>
+                      <%
+                  });
+                }
+                else
+                { 
+                  %>
+                  <option>No Hotel Added</option>
+                  <%
+                }%>
+          </select>
           <input type="file" class="form-control" id="name" name="filename" required />
         </div>
 

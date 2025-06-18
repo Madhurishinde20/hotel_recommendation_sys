@@ -28,6 +28,10 @@ router.post("/addhotel", controller.saveHotel);
 
 router.get("/hotelform",controller.hotelviewCtrl);
 
+router.get("/hotelviewdata", controller.viewHotelCtrl);
+
+
+
 
 router.get("/hotelImgDash",controller.hotelImageDashCtrl);
 
@@ -69,5 +73,19 @@ router.get("/viewcustomer",controller.ViewHotelDash);
 
 // User DashBorad Controller
 router.get("/userDashboard",controller.userPanel);
+
+
+router.get("/userhotel",controller.userhotelDashCtrl);
+
+
+
+
+
+
+
+
+
+
+
 
 module.exports=router;
