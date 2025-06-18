@@ -100,7 +100,7 @@ exports.hotelformCtrl=(req,res)=>{
 // hotel add 
 exports.saveHotel = (req, res) => {
   let {
-    hotel_id,
+    
     hotel_name,
     hotel_address,
     city_id,
@@ -114,7 +114,7 @@ exports.saveHotel = (req, res) => {
   console.log(req.body);
 
   // Convert data types
-  hotel_id = parseInt(hotel_id);
+ 
   city_id = parseInt(city_id);
   area_id = parseInt(area_id);
   hotel_contact = parseInt(hotel_contact);
@@ -131,8 +131,8 @@ exports.saveHotel = (req, res) => {
       console.error("Error inserting hotel:", err);
       return res.send("Error saving hotel data");
     } else {
-       console.log("successfully added");
-       
+       console.log("successfully added"); 
+       return res.redirect("/hotelform?msg=Hotel added successfully!"); 
     }
   });
 };
@@ -149,32 +149,159 @@ exports.hotelviewCtrl = (req, res) => {
       if (err) {
         return res.send("Error loading areas");
       }
-
+      console.log(areaResult);
       res.render("hotel.ejs", {
         data: citResult,
         Areadata: areaResult,
+        
       });
     });
   });
 };
 
-
 exports.viewHotelCtrl = (req, res) => {
-  const hotelQuery = `
-     SELECT h.*, c.city_name, a.area_name,hp.filename
-       FROM hotelpicjoin hp inner join hotelmaster h on h.hotel_id=hp.hotel_id
-       JOIN citymaster c ON h.city_id = c.city_id
-       JOIN areamaster a ON h.area_id = a.area_id 
+  let hotelQuery = `
+    SELECT h.*, c.city_name, a.area_name, hp.filename
+    FROM hotelpicjoin hp 
+    INNER JOIN hotelmaster h ON h.hotel_id = hp.hotel_id
+    JOIN citymaster c ON h.city_id = c.city_id
+    JOIN areamaster a ON h.area_id = a.area_id 
+   
   `;
-
-  db.query(hotelQuery, (err, hotelResults) => {
-    if (err) {
-      return res.send("Error loading hotels");
+  db.query(hotelQuery,  (err, hotelResults) => {
+    if (err || hotelResults.length === 0) {
+      return res.send("Error loading hotel or hotel not found.");
     }
 
-    res.render("viewHotelAdmin.ejs", {
-      data: hotelResults
-    });
+    res.render("viewHotelAdmin.ejs", { HotelAdmindata:hotelResults });
+  });
+};
+
+exports.viewHotelwithImage=(req,res)=>{
+  let hotelId = req.params.id;
+let hotelQuery = `
+    SELECT h.*, c.city_name, a.area_name, hp.filename
+    FROM hotelpicjoin hp 
+    INNER JOIN hotelmaster h ON h.hotel_id = hp.hotel_id
+    JOIN citymaster c ON h.city_id = c.city_id
+    JOIN areamaster a ON h.area_id = a.area_id 
+     where h.hotel_id=?
+  `;
+  db.query(hotelQuery,[hotelId],(err, hotelResults) => {
+    if (err || hotelResults.length === 0) {
+      return res.send("Error loading hotel or hotel not found.");
+    }
+    res.render("hotelview.ejs",{ hotel: hotelResults[0] } );
+  });
+};
+  
+
+exports.HotelUpadate = (req, res) => {
+
+let hotelid = parseInt(req.query.hotelid.trim());
+console.log(hotelid);
+        let temp;
+
+  const query = `
+    SELECT 
+      h.hotel_id,
+      p.filename,
+      h.hotel_name,
+      h.hotel_address,
+      c.city_name,
+      a.area_name,
+      h.hotel_email,
+      h.hotel_contact,
+      h.rating
+    FROM 
+      hotelmaster h
+    LEFT JOIN 
+      hotelpicjoin p ON h.hotel_id = h.hotel_id
+    JOIN 
+      citymaster c ON h.city_id = c.city_id
+    JOIN 
+      areamaster a ON h.area_id = a.area_id
+    where h.hotel_id=?
+  `;
+
+  db.query(query,[hotelid],(err, result) => {
+    if (err) {
+      console.log("err "+err);
+          } else {
+
+		// temp=result;
+		 console.log(result);
+
+      db.query("SELECT * FROM citymaster",(err,citresult)=>{
+
+	db.query("SELECT * FROM areamaster",(err,arearesult)=>{
+
+	db.query("SELECT * FROM hotelpicjoin",(err,picresult)=>{
+     res.render("updateHotelById.ejs",{erecord: result[0],Citdata:citresult,Areadata:arearesult,Picdata:picresult});
+})
+})
+})
+    }
+  });
+};
+
+exports.FinlHotelUpadate = (req, res) => {
+	let {hotel_id,hotel_name,hotel_address,city_id,area_id,hotel_email, hotel_contact,rating}=req.body;
+
+	db.query("update hotelmaster set hotel_name=?,hotel_address=?,city_id=?, area_id=?,hotel_email=?,hotel_contact=?, rating=? where hotel_id=?",[hotel_name,hotel_address,city_id,area_id,hotel_email, hotel_contact,rating,hotel_id],(err,result)=>{
+     if (err) {
+      console.log("Update error: ", err);
+      return res.send("Error updating hotel.");
+    }
+  
+      res.redirect("/hotelviewdata");
+  });
+
+};
+
+exports.HotelView = (req, res) => {
+  const query = `
+    SELECT 
+      h.hotel_id,
+      p.filename,
+      h.hotel_name,
+      h.hotel_address,
+      c.city_name,
+      a.area_name,
+      h.hotel_email,
+      h.hotel_contact,
+      h.rating
+    FROM 
+      hotelmaster h
+    LEFT JOIN 
+      hotelpicjoin p ON h.hotel_id = p.hotel_id
+    JOIN 
+      citymaster c ON h.city_id = c.city_id
+    JOIN 
+      areamaster a ON h.area_id = a.area_id
+  `;
+
+  db.query(query, (err, result) => {
+    if (err) {
+      
+      return res.render("hotelview.ejs"); 
+    } else {
+      res.render("hotelview.ejs", { data: result });
+    }
+  });
+};
+
+// hotel Delete
+exports.HotelAdminDelete=(req, res) => {
+  let  hotel_id = parseInt(req.query.hoteladminid.trim());
+  db.query("delete from hotelmaster where hotel_id=?", [hotel_id], (err, result) => {
+});
+  db.query("select * from hotelmaster", (err, result) => {
+    if (err) {
+      console.log("Some Problem Occured " + err);
+    } else {
+      res.render("viewHotelAdmin.ejs", { HotelAdmindata: result });
+    }
   });
 };
 
@@ -223,6 +350,18 @@ catch(err)
 {
   res.render("addHotelImage.ejs",{ msg: "Hotel image uploaded successfully!",hoteldata:[] });
 }
+};
+
+exports.ViewImgCtrl = (req, res) => {
+  db.query("SELECT * FROM hotelpicjoin", (err, result) => {
+    if (err) {
+      console.error("Error fetching images:", err);
+      return res.send("Error loading images");
+    }
+    res.render("viewHotelImage.ejs", {
+      HotelPicdata: result 
+    });
+  });
 };
 
 
@@ -363,17 +502,21 @@ exports.areaDeleteCtrl=(req, res) => {
 };
 
 // Customer 
-  exports.ViewHotelDash=(req,res)=>{
+  exports.CustomerView=(req, res) => {
+	db.query("select * from usermaster where type=?",["user"],(err,result)=>
+{
+	if(err)
+	{
+		res.render("customer.ejs",{Userdata:[]});
 
-  db.query("SELECT * FROM citymaster",(err,citresult)=>{
+	}
+	else
+	{
+		res.render("customer.ejs",{Userdata:result});
 
-	db.query("SELECT * FROM areamaster",(err,arearesult)=>{
-
-	res.render("customer.ejs",{Citdata:citresult,Areadata:arearesult});
-
-	});
+	}
 });
-};
+}
 
 
 
@@ -393,3 +536,29 @@ exports.userhotelDashCtrl=(req,res)=>{
   res.render("userhotelDash.ejs",{ Citdata, filename });
 };
 
+
+// Rating and Review
+
+exports.reviewRatingCtrl=(req,res)=>{
+  res.render("UserAddreview.ejs",{ msg: "" });
+};
+
+exports.Reviewpage=(req,res)=>{
+	res.render("UserAddreview.ejs",{msg:""});
+};
+
+exports.SaveReview=(req,res)=>
+{
+ let {rev_text,rating,rev_date}=req.body;
+
+
+db.query("insert into reviewmaster  values('0',?,?,?)", [rev_text,rating,rev_date],(err,result)=>
+{
+	if(err){
+		res.render("UserAddreview.ejs",{msg:"Some Problem Occured while Adding Review"});
+	}else{
+		res.render("UserAddreview.ejs",{msg:"Review added successfully"});
+	}
+});
+
+};
