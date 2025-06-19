@@ -171,8 +171,8 @@ exports.viewHotelCtrl = (req, res) => {
   db.query(hotelQuery,  (err, hotelResults) => {
     if (err || hotelResults.length === 0) {
       return res.send("Error loading hotel or hotel not found.");
+      console.error(err);
     }
-
     res.render("viewHotelAdmin.ejs", { HotelAdmindata:hotelResults });
   });
 };
@@ -191,126 +191,100 @@ let hotelQuery = `
     if (err || hotelResults.length === 0) {
       return res.send("Error loading hotel or hotel not found.");
     }
-    res.render("hotelview.ejs",{ hotel: hotelResults[0] } );
+    res.render("hotelview.ejs",{ hotel: hotelResults } );
   });
 };
   
+  exports.HotelUpadate = (req, res) => {
+  let hotelid = parseInt(req.query.hotelid.trim());
+  console.log("Hotel ID to update:", hotelid);
 
-exports.HotelUpadate = (req, res) => {
+  const query = "SELECT h.hotel_id, p.filename, h.hotel_name, h.hotel_address, c.city_id, c.city_name, a.area_id, a.area_name, h.hotel_email, h.hotel_contact, h.rating FROM hotelmaster h LEFT JOIN hotelpicjoin p ON h.hotel_id = p.hotel_id JOIN citymaster c ON h.city_id = c.city_id JOIN areamaster a ON h.area_id = a.area_id WHERE h.hotel_id = ?";
 
-let hotelid = parseInt(req.query.hotelid.trim());
-console.log(hotelid);
-        let temp;
+  db.query(query, [hotelid], (err, result) => {
+    if (err) return res.send("Error loading hotel data");
+    if (result.length === 0) return res.send("No hotel found");
 
-  const query = `
-    SELECT 
-      h.hotel_id,
-      p.filename,
-      h.hotel_name,
-      h.hotel_address,
-      c.city_name,
-      a.area_name,
-      h.hotel_email,
-      h.hotel_contact,
-      h.rating
-    FROM 
-      hotelmaster h
-    LEFT JOIN 
-      hotelpicjoin p ON h.hotel_id = h.hotel_id
-    JOIN 
-      citymaster c ON h.city_id = c.city_id
-    JOIN 
-      areamaster a ON h.area_id = a.area_id
-    where h.hotel_id=?
-  `;
-
-  db.query(query,[hotelid],(err, result) => {
-    if (err) {
-      console.log("err "+err);
-          } else {
-
-		// temp=result;
-		 console.log(result);
-
-      db.query("SELECT * FROM citymaster",(err,citresult)=>{
-
-	db.query("SELECT * FROM areamaster",(err,arearesult)=>{
-
-	db.query("SELECT * FROM hotelpicjoin",(err,picresult)=>{
-     res.render("updateHotelById.ejs",{erecord: result[0],Citdata:citresult,Areadata:arearesult,Picdata:picresult});
-})
-})
-})
-    }
+    db.query("SELECT * FROM citymaster", (err, citresult) => {
+      db.query("SELECT * FROM areamaster", (err, arearesult) => {
+        db.query("SELECT * FROM hotelpicjoin", (err, picresult) => {
+          res.render("updateHotelById.ejs", {
+            erecord: result[0],
+            Citdata: citresult,
+            Areadata: arearesult,
+            Picdata: picresult
+          });
+        });
+      });
+    });
   });
 };
 
-exports.FinlHotelUpadate = (req, res) => {
-	let {hotel_id,hotel_name,hotel_address,city_id,area_id,hotel_email, hotel_contact,rating}=req.body;
+  exports.FinlHotelUpadate = (req, res) => {
+  let {
+    hotel_id,
+    hotel_name,
+    hotel_address,
+    city_id,
+    area_id,
+    hotel_email,
+    hotel_contact,
+    rating
+  } = req.body;
+   console.log("Update Request Body:", req.body);
+  const updateQuery = "UPDATE hotelmaster SET hotel_name=?, hotel_address=?, city_id=?, area_id=?, hotel_email=?, hotel_contact=?, rating=? WHERE hotel_id=?";
 
-	db.query("update hotelmaster set hotel_name=?,hotel_address=?,city_id=?, area_id=?,hotel_email=?,hotel_contact=?, rating=? where hotel_id=?",[hotel_name,hotel_address,city_id,area_id,hotel_email, hotel_contact,rating,hotel_id],(err,result)=>{
-     if (err) {
-      console.log("Update error: ", err);
+  db.query(updateQuery, [hotel_name, hotel_address, city_id, area_id, hotel_email, hotel_contact, rating, hotel_id], (err, result) => {
+    if (err) {
+      console.log("Update error:", err);
       return res.send("Error updating hotel.");
     }
-  
-      res.redirect("/hotelviewdata");
+    res.redirect("/hotelviewdata");
   });
-
 };
 
 exports.HotelView = (req, res) => {
-  const query = `
-    SELECT 
-      h.hotel_id,
-      p.filename,
-      h.hotel_name,
-      h.hotel_address,
-      c.city_name,
-      a.area_name,
-      h.hotel_email,
-      h.hotel_contact,
-      h.rating
-    FROM 
-      hotelmaster h
-    LEFT JOIN 
-      hotelpicjoin p ON h.hotel_id = p.hotel_id
-    JOIN 
-      citymaster c ON h.city_id = c.city_id
-    JOIN 
-      areamaster a ON h.area_id = a.area_id
-  `;
-
-  db.query(query, (err, result) => {
-    if (err) {
-      
-      return res.render("hotelview.ejs"); 
-    } else {
-      res.render("hotelview.ejs", { data: result });
-    }
+  db.query("SELECT * FROM hotelmaster", (err, result) => {
+    if (err) return res.send("Error loading hotel list");
+    res.render("viewHotelAdmin.ejs", { hoteldata: result });
   });
 };
 
 // hotel Delete
-exports.HotelAdminDelete=(req, res) => {
-  let  hotel_id = parseInt(req.query.hoteladminid.trim());
-  db.query("delete from hotelmaster where hotel_id=?", [hotel_id], (err, result) => {
-});
-  db.query("select * from hotelmaster", (err, result) => {
-    if (err) {
-      console.log("Some Problem Occured " + err);
-    } else {
-      res.render("viewHotelAdmin.ejs", { HotelAdmindata: result });
+exports.HotelAdminDelete = (req, res) => {
+  let hotel_id = parseInt(req.query.hoteladminid.trim());
+
+  // First delete from hotelpicjoin (child table)
+  db.query("DELETE FROM hotelpicjoin WHERE hotel_id = ?", [hotel_id], (err1, result1) => {
+    if (err1) {
+      console.log("Error deleting hotel image:", err1);
+      return res.send("Cannot delete hotel image. Check console.");
     }
+
+    // Then delete from hotelmaster (parent table)
+    db.query("DELETE FROM hotelmaster WHERE hotel_id = ?", [hotel_id], (err2, result2) => {
+      if (err2) {
+        console.log("Error deleting hotel:", err2);
+        return res.send("Cannot delete hotel. Check console.");
+      }
+
+      // After delete, load and show hotel list
+      db.query(`SELECT h.hotel_id, h.hotel_name, h.hotel_address, c.city_name, a.area_name,
+                       h.hotel_email, h.hotel_contact, h.rating, hp.filename
+                FROM hotelmaster h
+                LEFT JOIN citymaster c ON h.city_id = c.city_id
+                LEFT JOIN areamaster a ON h.area_id = a.area_id
+                LEFT JOIN hotelpicjoin hp ON h.hotel_id = hp.hotel_id`, 
+                (err3, result3) => {
+        if (err3) {
+          console.log("Error loading hotel list:", err3);
+          return res.send("Error loading updated hotel list.");
+        }
+        res.render("viewHotelAdmin.ejs", { HotelAdmindata: result3 });
+      });
+    });
   });
 };
-
-
-
-
-
-
-
 
 //Hotel Image Controller
 
@@ -364,7 +338,7 @@ exports.ViewImgCtrl = (req, res) => {
   });
 };
 
-
+ 
 // City All Controller
 
   exports.CityDashCtrl=(req,res)=>{
@@ -501,6 +475,101 @@ exports.areaDeleteCtrl=(req, res) => {
   });
 };
 
+//Amenities
+
+exports.AmenitiesDash=(req,res)=>{
+
+	res.render("amenitiesDash.ejs");
+
+};
+
+exports.Amenitiespage=(req,res)=>{
+
+	res.render("amenities.ejs",{msg:""});
+
+};
+
+exports.Saveamenities=(req,res)=>
+{
+ let {amenity_name}=req.body;
+db.query("insert into amenities  values('0',?)", [amenity_name],(err,result)=>
+{
+	if(err){
+		res.render("amenities.ejs",{msg:"Some Problem Occured while Adding course"});
+	}else{
+		res.render("amenities.ejs",{msg:"Amenities added successfully"});
+	}
+});
+};
+
+exports.ViewAmenitiespage=(req, res) => {
+	db.query("select * from amenities",(err,result)=>
+{
+	if(err)
+	{
+		res.render("viewAmenities.ejs");
+
+	}
+	else
+	{
+		res.render("viewAmenities.ejs",{Amenitiesdata:result});
+
+	}
+});
+}
+
+
+exports.AmenitiesDelete=(req, res) => {
+  let  amenity_id  = parseInt(req.query.amenityid.trim());
+  db.query("delete from amenities where  amenity_id =?", [ amenity_id ], (err, result) => {
+
+	if(err)
+	{
+		console.log(err)
+	}
+});
+  db.query("select * from amenities", (err, result) => {
+    if (err) {
+      console.log("Some Problem Occured " + err);
+    } else {
+      res.render("viewAmenities.ejs", { Amenitiesdata: result });
+    }
+  });
+};
+
+exports.AmenitiesUpdateForm = (req, res) => {
+  let amenity_id = parseInt(req.query.amenityid.trim());
+  db.query("SELECT * FROM amenities WHERE amenity_id = ?", [amenity_id], (err, result) => {
+    if (err) {
+      console.log(err);
+      return res.send("Error fetching amenity.");
+    }
+    if (result.length > 0) {
+      res.render("updateAmenities.ejs", { singleAmenity: result[0],msg: "" });
+    } else {
+      res.send("Amenity not found");
+    }
+  });
+};
+
+exports.AmenitiesUpdateSave = (req, res) => {
+  const { amenity_id, amenity_name } = req.body;
+  db.query("UPDATE amenities SET amenity_name = ? WHERE amenity_id = ?", [amenity_name, amenity_id], (err, result) => {
+    if (err) {
+      console.log("Update error: ", err);
+      return res.send("Error updating amenity.");
+    }
+    db.query("SELECT * FROM amenities", (err, result) => {
+      if (err) {
+        console.log("Some Problem Occured " + err);
+      } else {
+        res.render("viewAmenities.ejs", { Amenitiesdata: result });
+      }
+    });
+  });
+};
+
+
 // Customer 
   exports.CustomerView=(req, res) => {
 	db.query("select * from usermaster where type=?",["user"],(err,result)=>
@@ -518,10 +587,24 @@ exports.areaDeleteCtrl=(req, res) => {
 });
 }
 
+//Logout 
 
+exports.logoutUser = (req, res) => {
+  try {
+    res.clearCookie('token');
+    // redirect entire window outside iframe
+    res.send('<script>window.top.location.href="/login"</script>');
+  } catch (err) {
+    console.error("Logout Error:", err);
+    res.status(500).send("Logout failed");
+  }
+};
 
+exports.HomePage = (req, res) => {
+  res.render("Home");
+};
 
-// User Dashboard Router
+//USER CTRL
 exports.userPanel=(req,res)=>{
   res.render("userDashboard");
 }

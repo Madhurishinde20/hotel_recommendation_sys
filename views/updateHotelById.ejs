@@ -61,6 +61,7 @@
       justify-content: center;
       gap: 20px;
       margin-top: 30px;
+      margin-left: 250px;;
     }
 
     h3 {
@@ -87,9 +88,11 @@
   <div class="box">
     <h3 class="text-center mb-4 text-uppercase">Upadte Hotel Details</h3>
     
-    <form action="/finalupdateHotel" method="post">
-      <div class="form-row">
+    <form action="/hotelupdatefinal" method="post">
 
+      <input type="hidden" name="hotel_id" value="<%= erecord.hotel_id %>">
+
+    <div class="form-row">
         <div class="form-group col-md-6">
           <label>Hotel Name</label>
           <input type="text" class="form-control" name="hotel_name" value="<%=erecord.hotel_name%>"  />
@@ -103,25 +106,23 @@
         <div class="form-group col-md-6">
           <label>City</label>
           <select name="city_id" class="form-control" onchange="fetcharea(this.value)" id="ns">
-  
-  <% Citdata.forEach((item, index) => { %>
-    <option value="<%= item.city_id %>" <%= (item.city_name === erecord.city_name) ? 'selected' : '' %>>
-      <%= item.city_name %>
-    </option>
-  <% }); %>
-</select>
+           <% Citdata.forEach((item, index) => { %>
+          <option value="<%= item.city_id %>" <%= (item.city_name === erecord.city_name) ? 'selected' : '' %>>
+          <%= item.city_name %>
+         </option>
+           <% }); %>
+        </select>
         </div>
 
         <div class="form-group col-md-6">
           <label>Area</label>
           <select name="area_id" class="form-control" id="area" required>
-
-  <% Areadata.forEach((item, index) => { %>
-    <option value="<%= item.area_id %>" <%= (item.area_id === erecord.area_id) ? 'selected' : '' %>>
-      <%= item.area_name %>
-    </option>
-  <% }); %>
-</select>
+        <% Areadata.forEach((item, index) => { %>
+        <option value="<%= item.area_id %>" <%= (item.area_id === erecord.area_id) ? 'selected' : '' %>>
+        <%= item.area_name %>
+        </option>
+        <% }); %>
+        </select>
         </div>
 
         <div class="form-group col-md-6">
@@ -141,23 +142,22 @@
 
         <div class="form-group col-md-6">
             <label>Image</label>
-    <select name="pic_id" class="form-control" required>
-    <option disabled>Select Image</option>
-    <% Picdata.forEach((item, index) => { %>
-      <option value="<%= item.pic_id %>" <%= (item.pic_id === erecord.pic_id) ? 'selected' : '' %>>
-        <%= item.filename %>
-      </option>
-    <% }); %>
-  </select>
-</div>
+         <select name="pic_id" class="form-control" required>
+         <option disabled>Select Image</option>
+         <% Picdata.forEach((item, index) => { %>
+         <option value="<%= item.pic_id %>" <%= (item.pic_id === erecord.pic_id) ? 'selected' : '' %>>
+         <%= item.filename %>
+         </option>
+         <% }); %>
+          </select>
+       </div>
 
       
       <div class="btn-row">
         <input type="submit" class="btn btn-submit-hotel" value="Upadate  Hotel" />
-        <a href="/" class="btn btn-submit-hotel text-center d-flex align-items-center justify-content-center">← Back</a>
       </div>
-    </form>
-  </div>
 
+    </div>
+  </div>
 </body>
 </html>
