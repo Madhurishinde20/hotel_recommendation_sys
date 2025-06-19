@@ -22,7 +22,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: linear-gradient(to right,purple, #eaafc8); /* Purple-blue gradient */
+  background: linear-gradient(to right,#654ea3,#eaafc8); /* Purple-blue gradient */
   color: black;
   padding: 15px 30px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
@@ -32,6 +32,7 @@
   margin: 0 auto;
   font-size: 30px;
   font-weight: bold;
+  margin-left: 550px;;
 }
 
 /* Profile Section */
@@ -81,9 +82,8 @@
 
 /* Sidebar */
 .sidebar {
-  width: 220px;
-  background: linear-gradient(to bottom,#c3bec0, #ede0e6);
-  color:black;
+  width: 210px;
+  color:white;
   padding-top: 20px;
   box-shadow: 2px 0 6px rgba(0, 0, 0, 0.15);
   overflow-y: auto;
@@ -105,7 +105,7 @@
 
 .sidebar-menu li a {
   text-decoration: none;
-  color:black;
+  color:white;
   display: flex;
   gap: 8px;
   align-items: center;
@@ -127,9 +127,11 @@
 .main-body {
   flex: 1;
   padding: 40px;
-  color:purple;
+  color:black;
   overflow: auto;
   height: 100%;
+  margin-top:-10x;
+  
 }
 
 .iframe-wrapper {
@@ -266,7 +268,7 @@
 
     </aside>
   <main class="main-body">
-    <h1>Welcome to Admin</h1>
+    
 <div class="iframe-wrapper">
       <iframe id="contentFrame" src="" scrolling="no"></iframe>
     </div>
